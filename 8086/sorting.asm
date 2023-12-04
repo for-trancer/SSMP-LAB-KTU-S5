@@ -4,7 +4,7 @@ str2 db "sorted list : $"
 sb db " $" ; to seperate the the data with space
 list db 9,1,8,2,7
 
-display macro msg ; macro to display an msg here msg is an variable
+display macro msg 
 	lea dx,msg
 	mov ah,09h
 	int 21h
