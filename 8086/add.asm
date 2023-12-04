@@ -1,34 +1,41 @@
-data segment 
-msg1 db 0ah,0dh,"enter first number : $"
-msg2 db 0ah,0dh,"enter second number : $"
-msg3 db 0ah,0dh,"sum : $"
+data segment
+	str1 db "enter the first number : $"
+	str2 db "enter the second number : $"
+	str3 db "sum : $"
+
+	display macro msg
+		lea dx,msg
+		mov ah,09h
+		int 21h
+	endm
+
+	input macro var
+		mov ah,01h
+		int 21h
+		mov var,al
+	endm
+
+	output macro var
+		mov ah,02h
+		mov dl,var
+		int 21h
+	endm
+
 data ends
 
 code segment
 assume cs:code,ds:data
-start: 
+start:
 	mov ax,data
 	mov ds,ax
 
-	lea dx,msg1
-	mov ah,09h
-	int 21h
-	mov ah,01h
-	int 21h
-	mov bh,al
-	mov ah,01h
-	int 21h
-	mov bl,al
+	display str1
+	input bh
+	input bl
 
-	lea dx,msg2
-	mov ah,09h
-	int 21h
-	mov ah,01h
-	int 21h
-	mov ch,al
-	mov ah,01h
-	int 21h
-	mov cl,al
+	display str2
+	input ch
+	input cl
 
 	mov al,bl
 	mov ah,00h
@@ -42,24 +49,16 @@ start:
 	add al,ch
 	aaa
 	add ax,3030h
-	mov cl,ah
 	mov bh,al
-	lea dx,msg3
-	mov ah,09h
-	int 21h
-	mov dl,cl
-	mov ah,02h
-	int 21h
-	mov dl,bh
-	mov ah,02h
-	int 21h
-	mov dl,bl
-	mov ah,02h
-	int 21h
+	mov cl,ah
+
+	display str3
+	output cl
+	output bh
+	output bl
+
 	mov ah,4ch
 	int 21h
+
 code ends
 	end start
-
-
-
