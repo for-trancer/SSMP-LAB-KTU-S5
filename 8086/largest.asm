@@ -40,7 +40,7 @@ main_prgrm:
 	mov ah,02h ; 02h is used to display the ascii character
 	int 21h
 	display msg
-	mov ah,4ch
+	mov ah,4ch ; code to exit the program
 	int 21h
 
 code ends
