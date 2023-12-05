@@ -10,7 +10,7 @@ display macro msg
 	int 21h
 endm
 
-displaylist macro 
+displaylist macro ; macro is implemented because here we need to display the list two times , in order to avoid repetition of code
 	mov al,[list+si] ; here si indicates the index
 	add al,30h ; to convert the number to ascii for displaying output
 	mov dl,al 
