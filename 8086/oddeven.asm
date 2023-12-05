@@ -3,7 +3,7 @@ data segment
 	str2 db " is even $"
 	str3 db "enter the number : $"
 
-	display macro msg
+	display macro msg ; macro to display a msg
 		lea dx,msg
 		mov ah,09h
 		int 21h
@@ -16,18 +16,18 @@ start:
 	mov ax,data
 	mov ds,ax
 
-	display str3
-	mov ah,01h
+	display str3 ;
+	mov ah,01h ; taking input 
 	int 21h
-	mov ah,01h
+	mov ah,01h ; taking another input , to make it to check between 0 - 99 , here only the last digit matters ,a number is even if its lsb is 0 
 	int 21h
 
-	test al,1 ; perform the bitwise AND operation with 1 and checks the lsb
-	jnz is_odd ; if lsb not zero it will be odd
+	test al,1 ; perform the bitwise AND operation b/w the number and 1 and checks the lsb
+	jnz is_odd ; if lsb is not zero it will be odd then do the is_odd 
 	display str2 ; else it will be even 
-	jmp exit
+	jmp exit ; jumping to exit because here order of execution is top to bottom , if a no is even no need to run the odd code below
 
-is_odd:
+is_odd: ; 
 	display str1
 
 exit:
