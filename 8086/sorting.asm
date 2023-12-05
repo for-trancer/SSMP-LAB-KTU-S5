@@ -10,6 +10,17 @@ display macro msg
 	int 21h
 endm
 
+displaylist macro 
+	mov al,[list+si] ; here si indicates the index
+	add al,30h ; to convert the number to ascii for displaying output
+	mov dl,al 
+	mov ah,02h ; interrupt to display the data
+	int 21h
+	display sb ; used to add a space b/w the values when displaying
+	inc si
+	cmp si,5 
+endm
+
 data ends
 
 code segment
@@ -22,18 +33,10 @@ start:
 
 	mov si,0 ; pointing to first list item
 
-list_before_sort: ; to display the list before sort
-	mov al,[list+si] ; here si indicates the index
-	add al,30h ; to convert the number to ascii for displaying output
-	mov dl,al 
-	mov ah,02h ; interrupt to display the data
-	int 21h
-	lea dx,sb ; to display space between each list item
-	mov ah,09h
-	int 21h
-	inc si
-	cmp si,5 
-	jl list_before_sort
+lb: ; to display the list before sort
+
+	displaylist
+	jl lb
 
 	mov cx,1 ; increment it after each out_loop
 
@@ -51,9 +54,9 @@ in_loop:
 counter: 
 	inc si
 	cmp si,4
-	jl in_loop
+	jl in_loop ; if cx<=4
 
-	inc cx ; comes out of in_loop and checks for the value of cx
+	inc cx ; comes out of in_loop  and checks for the value of cx
 	cmp cx,5 ; if cx is 5 the outer loop will be executed 5 times sorting every number
 	jle out_loop ; if cx<=5
 
@@ -61,18 +64,9 @@ counter:
 
 	mov si,0
 
-list_after_sort: ; same as list_before_sort it is used to display the list after sorting
-	mov al,[list+si]
-	add al,30h
-	mov dl,al
-	mov ah,02h
-	int 21h
-	lea dx,sb
-	mov ah,09h
-	int 21h
-	inc si
-	cmp si,5
-	jl list_after_sort
+la: ; to display the list after sort
+	displaylist
+	jl la
 
 	mov ah,4ch
 	int 21h
