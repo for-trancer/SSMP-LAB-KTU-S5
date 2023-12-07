@@ -1,5 +1,5 @@
 data segment
-list db 1,2,3,4, ; array list
+list db 1,2,3,4,5, ; array list
 msg db 'Enter The Number To Search : $'
 str1 db ' is found!$'
 str2 db ' is not found!$'
