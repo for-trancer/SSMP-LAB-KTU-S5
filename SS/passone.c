@@ -5,19 +5,20 @@ void main() {
     char opcode[10], operand[10], label[10], code[10], mnemonic[10];
     int locctr, start, length;
 
-    FILE *fp1, *fp2, *fp3, *fp4;
+    FILE *fp1, *fp2, *fp3, *fp4,*fp5;
 
     fp1 = fopen("input.txt", "r");
     fp2 = fopen("optab.txt", "r");
     fp3 = fopen("symtab.txt", "w");
     fp4 = fopen("output.txt", "w");
+    fp5 = fopen("length.txt","w");
 
     fscanf(fp1, "%s\t%s\t%s", label, opcode, operand);
 
     if(strcmp(opcode, "START")==0) {
         start = atoi(operand);
         locctr = start;
-        fprintf(fp4, "\t%s\t%s\t%s\n", label, opcode, operand);
+        fprintf(fp4,"**\t%s\t%s\t%s\n",label,opcode, operand);
         fscanf(fp1, "%s\t%s\t%s", label, opcode, operand);
     }
     else {
@@ -63,11 +64,13 @@ void main() {
     length = locctr-start;
 
     printf("The length of the code : %d\n", length);
+    fprintf(fp5,"%d",length);
 
     fclose(fp1);
     fclose(fp2);
     fclose(fp3);
     fclose(fp4);
+    fclose(fp5);
 }
 
 /*
