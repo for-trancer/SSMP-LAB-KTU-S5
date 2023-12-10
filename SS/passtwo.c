@@ -23,7 +23,7 @@ void main()
         start=atoi(operand);
         fscanf(flen,"%d",&length);
     }
-    printf("H^%s^00%d^00%x\n",label,start,length);
+    printf("H^%s^00%d^00%d\n",label,start,length);
     fscanf(fin,"%s%s%s%s",addr,label,opcode,operand);
     printf("T^00%s^%x",addr,length);
     while(strcmp(opcode,"END")!=0)
