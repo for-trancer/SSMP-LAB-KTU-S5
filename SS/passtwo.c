@@ -75,6 +75,7 @@ void main()
         fop=fopen("optab.txt","r");
         fseek(fop,0,SEEK_SET);
     }
+    printf("$");
     printf("\nE^00%d\n",start);
     fclose(fin);
     fclose(fop);
