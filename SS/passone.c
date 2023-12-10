@@ -1,102 +1,103 @@
-#include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
-void main() {
-    char opcode[10], operand[10], label[10], code[10], mnemonic[10];
-    int locctr, start, length;
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
-    FILE *fp1, *fp2, *fp3, *fp4,*fp5;
+void  main()
+{
+    char label[10],opcode[10],operand[10],code[10],mnemonics[10];
+    int locctr,length,start,op;
 
-    fp1 = fopen("input.txt", "r");
-    fp2 = fopen("optab.txt", "r");
-    fp3 = fopen("symtab.txt", "w");
-    fp4 = fopen("output.txt", "w");
-    fp5 = fopen("length.txt","w");
+    FILE *fin,*fop,*fout,*fs,*flen;
 
-    fscanf(fp1, "%s\t%s\t%s", label, opcode, operand);
+    fin=fopen("input.txt","r");
+    fop=fopen("optab.txt","r");
+    fout=fopen("output.txt","w");
+    fs=fopen("symtab.txt","w");
+    flen=fopen("length.txt","w");
 
-    if(strcmp(opcode, "START")==0) {
-        start = atoi(operand);
-        locctr = start;
-        fprintf(fp4,"**\t%s\t%s\t%s\n",label,opcode, operand);
-        fscanf(fp1, "%s\t%s\t%s", label, opcode, operand);
+    fscanf(fin,"%s%s%s",label,opcode,operand);
+    if(strcmp(opcode,"START")==0)
+    {
+        start=atoi(operand);
+        locctr=start;
+        fprintf(fout,"-\t\t%s\t%s\t%s\n",label,opcode,operand);
+        fscanf(fin,"%s%s%s",label,opcode,operand);
     }
-    else {
-        locctr = 0;
+    else
+    {
+        locctr=0;
     }
 
-    while(strcmp(opcode, "END")!=0) {
-        fprintf(fp4, "%d\t", locctr);
+    while(strcmp(opcode,"END")!=0)
+    {
+        fprintf(fout,"%d\t",locctr);
 
-        if(strcmp(label, "**")!=0) {
-            fprintf(fp3, "%s\t%d\n", label, locctr);
+        if(strcmp(label,"-")!=0)
+        {
+            fprintf(fs,"%d\t%s\n",locctr,label);
         }
 
-        fscanf(fp2, "%s\t%s", code, mnemonic);
+        fscanf(fop,"%s%s",code,mnemonics);
 
-        while(strcmp(code, "END")!=0) {
-            if(strcmp(opcode, code)==0) {
+        while(!feof(fop))
+        {
+            if(strcmp(opcode,code)==0)
+            {
                 locctr+=3;
                 break;
             }
-            fscanf(fp2, "%s\t%s", code, mnemonic);
+            fscanf(fop,"%s%s",code,mnemonics);
         }
+        fseek(fop,0,SEEK_SET);
 
-        if(strcmp(opcode, "WORD")==0) {
+        if(strcmp(opcode,"WORD")==0)
+        {
             locctr+=3;
         }
-        else if(strcmp(opcode, "RESW")==0) {
+        else if(strcmp(opcode,"RESW")==0)
+        {
             locctr+=(3*(atoi(operand)));
         }
-        else if(strcmp(opcode, "RESB")==0) {
+        else if(strcmp(opcode,"BYTE")==0)
+        {
+            locctr+=strlen(operand)-3;
+        }
+        else if(strcmp(opcode,"RESB")==0)
+        {
             locctr+=(atoi(operand));
         }
-        else if(strcmp(opcode, "BYTE")==0) {
-            ++locctr;
-        }
 
-        fprintf(fp4, "%s\t%s\t%s\t\n", label, opcode, operand);
-        fscanf(fp1, "%s\t%s\t%s", label, opcode, operand);
+        fprintf(fout,"%s\t%s\t%s\n",label,opcode,operand);
+        fscanf(fin,"%s%s%s",label,opcode,operand);
     }
-
-    fprintf(fp4, "%d\t%s\t%s\t%s\n", locctr, label, opcode, operand);
-
-    length = locctr-start;
-
-    printf("The length of the code : %d\n", length);
-    fprintf(fp5,"%d",length);
-
-    fclose(fp1);
-    fclose(fp2);
-    fclose(fp3);
-    fclose(fp4);
-    fclose(fp5);
+    length=locctr-start;
+    fprintf(flen,"%d",length);
+    fprintf(fout,"%d\t%s\t%s\t%s",locctr,label,opcode,operand);
+    printf("Length Of The Code : %d",length);
 }
 
+// required input files , same as in the repository
+
 /*
+input.txt
 
-!! These are the required input files !!
-
-input.txt 
-
-**      START       2000
-**      LDA         FIVE
-**      STA         ALPHA
-**      LDCH        CHARZ
-**      STCH        C1
-ALPHA   RESW        2
-FIVE    WORD        5
-CHARZ   BYTE        C'Z'
-C1      RESB        2
-**      END         **
+COPY       START   2000
+-       LDA     FIVE
+-       STA     ALPHA
+-       LDCH    CHARZ
+-       STCH    C1
+ALPHA   RESW    2
+FIVE    WORD    5
+CHARZ   BYTE    C'hello'
+C1      RESB    2
+-       END     -
 
 optab.txt
 
-START       **
-LDA         03
-STA         0f
-LDCH        53
-STCH        57
-END         **
+LDCH    53
+STCH    57
+LDA     03
+STA     0f
 
+this pass one will generate symtab.txt,length.txt,output.txt for the passtwo.c
 */
