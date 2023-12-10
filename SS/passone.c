@@ -1,103 +1,102 @@
+// run passone.c executable file before this,in order to obtain the input files for this
+
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
-void  main()
+void main()
 {
-    char label[10],opcode[10],operand[10],code[10],mnemonics[10];
-    int locctr,length,start,op;
+    char addr[10],label[10],opcode[10],operand[10],code[10],mnemonics[10],saddr[10],slabel[10],length;
+    int start,locctr,i,len;
 
-    FILE *fin,*fop,*fout,*fs,*flen;
+    FILE *fin,*fop,*flen,*fs,*fout;
 
-    fin=fopen("input.txt","r");
+    fin=fopen("output.txt","r");
     fop=fopen("optab.txt","r");
-    fout=fopen("output.txt","w");
-    fs=fopen("symtab.txt","w");
-    flen=fopen("length.txt","w");
+    flen=fopen("length.txt","r");
+    fs=fopen("symtab.txt","r");
+    fout=fopen("objectcode.txt","w");
 
-    fscanf(fin,"%s%s%s",label,opcode,operand);
+    fscanf(fin,"%s%s%s%s",addr,label,opcode,operand);
+
     if(strcmp(opcode,"START")==0)
     {
         start=atoi(operand);
-        locctr=start;
-        fprintf(fout,"-\t\t%s\t%s\t%s\n",label,opcode,operand);
-        fscanf(fin,"%s%s%s",label,opcode,operand);
-    }
-    else
-    {
-        locctr=0;
+        fscanf(flen,"%d",&length);
     }
 
+    printf("H^%s^00%d^00%d\n",label,start,length); // for displaying o/p in the terminal
+
+    fprintf(fout,"H^%s^00%d^00%d\n",label,start,length); // for writing o/p to external file
+
+    fscanf(fin,"%s%s%s%s",addr,label,opcode,operand);
+
+    printf("T^00%s^%x",addr,length);
+
+    fprintf(fout,"T^00%s^%x",addr,length);
     while(strcmp(opcode,"END")!=0)
     {
-        fprintf(fout,"%d\t",locctr);
-
-        if(strcmp(label,"-")!=0)
-        {
-            fprintf(fs,"%d\t%s\n",locctr,label);
-        }
-
         fscanf(fop,"%s%s",code,mnemonics);
-
         while(!feof(fop))
         {
             if(strcmp(opcode,code)==0)
             {
-                locctr+=3;
+                fscanf(fs,"%s%s",saddr,slabel);
+                while(!feof(fs))
+                {
+                    if(strcmp(operand,slabel)==0)
+                    {
+                        fclose(fop);
+                        printf("^%s%s",mnemonics,saddr);
+                        fprintf(fout,"^%s%s",mnemonics,saddr);
+                        break;
+                    }
+                    else
+                    {
+                        fscanf(fs,"%s%s",saddr,slabel);
+                    }
+                }
+                fseek(fs,0,SEEK_SET);
                 break;
             }
-            fscanf(fop,"%s%s",code,mnemonics);
+            else
+            {
+                fscanf(fop,"%s%s",code,mnemonics);
+            }
         }
+        if(strcmp(opcode,"BYTE")==0 || strcmp(opcode,"WORD")==0)
+        {
+            if(strcmp(opcode,"WORD")==0)
+            {
+                printf("^0000%s",operand);
+            }
+            else if(strcmp(opcode,"BYTE")==0)
+            {
+                int len=strlen(operand);
+                printf("^");
+                for(i=2;i<len-1;i++)
+                {
+                    printf("%x",operand[i]);
+                }
+            }
+        }
+        fscanf(fin,"%s%s%s%s",addr,label,opcode,operand);
+        fop=fopen("optab.txt","r");
         fseek(fop,0,SEEK_SET);
-
-        if(strcmp(opcode,"WORD")==0)
-        {
-            locctr+=3;
-        }
-        else if(strcmp(opcode,"RESW")==0)
-        {
-            locctr+=(3*(atoi(operand)));
-        }
-        else if(strcmp(opcode,"BYTE")==0)
-        {
-            locctr+=strlen(operand)-3;
-        }
-        else if(strcmp(opcode,"RESB")==0)
-        {
-            locctr+=(atoi(operand));
-        }
-
-        fprintf(fout,"%s\t%s\t%s\n",label,opcode,operand);
-        fscanf(fin,"%s%s%s",label,opcode,operand);
     }
-    length=locctr-start;
-    fprintf(flen,"%d",length);
-    fprintf(fout,"%d\t%s\t%s\t%s",locctr,label,opcode,operand);
-    printf("Length Of The Code : %d",length);
+
+    printf("$");
+    fprintf(fout,"$");
+
+    printf("\nE^00%d\n",start);
+    fprintf(fout,"\nE^00%d\n",start);
+
+    fclose(fin);
+    fclose(fop);
+    fclose(flen);
+    fclose(fs);
 }
 
-// required input files , same as in the repository
+// it doesnot require any input files because the pass one will automaticaly generate the required files for this
 
-/*
-input.txt
 
-COPY       START   2000
--       LDA     FIVE
--       STA     ALPHA
--       LDCH    CHARZ
--       STCH    C1
-ALPHA   RESW    2
-FIVE    WORD    5
-CHARZ   BYTE    C'hello'
-C1      RESB    2
--       END     -
-
-optab.txt
-
-LDCH    53
-STCH    57
-LDA     03
-STA     0f
-
-this pass one will generate symtab.txt,length.txt,output.txt for the passtwo.c
-*/
