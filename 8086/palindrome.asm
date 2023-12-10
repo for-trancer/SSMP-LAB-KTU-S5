@@ -1,55 +1,63 @@
 data segment
-    rev db 20 dup(?)
-    str1 db "Enter the string : $"
-    msg1 db "is palindrome!$"
-    msg2 db "not palindrome!$"
+    msg1 db " enter the string :  $"   
+    msg2 db " entered string : $"
+    msg3 db " is palindrome!$"
+    msg4 db " is not palindrome!$"
+    
+    str db 10 dup(?)
 
     display macro msg
         lea dx,msg
         mov ah,09h
         int 21h
     endm
-data ends
 
+    input macro var
+        mov ah,01h
+        int 21h
+        mov var,al
+    endm
+
+data ends
 code segment
-assume cs:code, ds:data
+assume ds:data,cs:code
 start:
     mov ax,data
     mov ds,ax
 
-    mov si,offset rev
-    mov bl,0
+    display msg1
+    mov si,0
 
-    display str1
-
-read:
-    mov ah,01h
-    int 21h
+read_input:
+    input al
     cmp al,0dh
-    je check
-    mov [si],al
+    je output
+    mov [str+si],al
     inc si
-    jmp read
+    jmp read_input
 
-check:
-    mov di,0
+output:
+    mov [str+si],"$"
+    display msg2
+    display str
+
     dec si
+    mov di,0
 
-palindrome:
-    mov al,[si]
-    mov bl,[rev+di]
+test_strings:
+    mov al,[str+si]
+    mov bl,[str+di]
     cmp al,bl
     jne not_palindrome 
     inc di
     dec si
     cmp si,0
-    jg palindrome
-
-    display msg1
+    jg test_strings
+    display msg3
     jmp exit
 
 not_palindrome:
-    display msg2
+    display msg4
 
 exit:
     mov ah,4ch
