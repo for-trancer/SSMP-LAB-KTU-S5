@@ -6,8 +6,8 @@
 
 void main()
 {
-    char addr[10],label[10],opcode[10],operand[10],code[10],mnemonics[10],saddr[10],slabel[10];
-    int start,length,locctr,i,len;
+    char addr[10],label[10],opcode[10],operand[10],code[10],mnemonics[10],saddr[10],slabel[10],length;
+    int start,locctr,i,len;
 
     FILE *fin,*fop,*flen,*fs;
 
@@ -25,7 +25,7 @@ void main()
     }
     printf("H^%s^%d^%d\n",label,start,length);
     fscanf(fin,"%s%s%s%s",addr,label,opcode,operand);
-    printf("T^00%s^%d",addr,length);
+    printf("T^00%s^%x",addr,length);
     while(strcmp(opcode,"END")!=0)
     {
         fscanf(fop,"%s%s",code,mnemonics);
