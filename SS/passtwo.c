@@ -9,12 +9,13 @@ void main()
     char addr[10],label[10],opcode[10],operand[10],code[10],mnemonics[10],saddr[10],slabel[10],length;
     int start,locctr,i,len;
 
-    FILE *fin,*fop,*flen,*fs;
+    FILE *fin,*fop,*flen,*fs,*fout;
 
     fin=fopen("output.txt","r");
     fop=fopen("optab.txt","r");
     flen=fopen("length.txt","r");
     fs=fopen("symtab.txt","r");
+    fout=fopen("objectcode.txt","w");
 
     fscanf(fin,"%s%s%s%s",addr,label,opcode,operand);
 
@@ -23,9 +24,16 @@ void main()
         start=atoi(operand);
         fscanf(flen,"%d",&length);
     }
-    printf("H^%s^00%d^00%d\n",label,start,length);
+
+    printf("H^%s^00%d^00%d\n",label,start,length); // for displaying o/p in the terminal
+
+    fprintf(fout,"H^%s^00%d^00%d\n",label,start,length); // for writing o/p to external file
+
     fscanf(fin,"%s%s%s%s",addr,label,opcode,operand);
+
     printf("T^00%s^%x",addr,length);
+
+    fprintf(fout,"T^00%s^%x",addr,length);
     while(strcmp(opcode,"END")!=0)
     {
         fscanf(fop,"%s%s",code,mnemonics);
@@ -40,6 +48,7 @@ void main()
                     {
                         fclose(fop);
                         printf("^%s%s",mnemonics,saddr);
+                        fprintf(fout,"^%s%s",mnemonics,saddr);
                         break;
                     }
                     else
@@ -75,8 +84,13 @@ void main()
         fop=fopen("optab.txt","r");
         fseek(fop,0,SEEK_SET);
     }
+
     printf("$");
+    fprintf(fout,"$");
+
     printf("\nE^00%d\n",start);
+    fprintf(fout,"\nE^00%d\n",start);
+
     fclose(fin);
     fclose(fop);
     fclose(flen);
